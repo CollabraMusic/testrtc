@@ -148,75 +148,48 @@ Call.parseCandidate = function(text) {
 };
 
 // Get a TURN config, either from settings or from CEOD.
-Call.asyncCreateTurnConfig = function(onSuccess, onError) {
+Call.asyncCreateTurnConfig = function(onSuccess) {
+  var config;
+  var iceServer;
   var settings = currentTest.settings;
   if (typeof(settings.turnURI) === 'string' && settings.turnURI !== '') {
-    var iceServer = {
+    iceServer = {
       'username': settings.turnUsername || '',
       'credential': settings.turnCredential || '',
       'urls': settings.turnURI.split(',')
     };
-    var config = {'iceServers': [iceServer]};
+    config = {'iceServers': [iceServer]};
     report.traceEventInstant('turn-config', config);
     setTimeout(onSuccess.bind(null, config), 0);
   } else {
-    Call.fetchCEODTurnConfig_(function(response) {
-      var iceServer = {
-        'username': response.username,
-        'credential': response.password,
-        'urls': response.uris
-      };
-      var config = {'iceServers': [iceServer]};
-      report.traceEventInstant('turn-config', config);
-      onSuccess(config);
-    }, onError);
+    iceServer = {
+      'credential': 'siicckk',
+      'urls': ['turn:collabra@turn.collabramusic.com']
+    };
+    config = {'iceServers': [iceServer]};
+    report.traceEventInstant('turn-config', config);
+    setTimeout(onSuccess.bind(null, config), 0);
   }
 };
 
 // Get a STUN config, either from settings or from CEOD.
-Call.asyncCreateStunConfig = function(onSuccess, onError) {
+Call.asyncCreateStunConfig = function(onSuccess) {
+  var config;
+  var iceServer;
   var settings = currentTest.settings;
   if (typeof(settings.stunURI) === 'string' && settings.stunURI !== '') {
-    var iceServer = {
+    iceServer = {
       'urls': settings.stunURI.split(',')
     };
-    var config = {'iceServers': [iceServer]};
+    config = {'iceServers': [iceServer]};
     report.traceEventInstant('stun-config', config);
     setTimeout(onSuccess.bind(null, config), 0);
   } else {
-    Call.fetchCEODTurnConfig_(function(response) {
-      var iceServer = {
-        'urls': response.uris.map(function(uri) {
-          return uri.replace(/^turn/, 'stun');
-        })
-      };
-      var config = {'iceServers': [iceServer]};
-      report.traceEventInstant('stun-config', config);
-      onSuccess(config);
-    }, onError);
+    iceServer = {
+      'urls': ['stun:turn.collabramusic.com']
+    };
+    config = {'iceServers': [iceServer]};
+    report.traceEventInstant('stun-config', config);
+    setTimeout(onSuccess.bind(null, config), 0);
   }
-};
-
-// Ask computeengineondemand to give us TURN server credentials and URIs.
-Call.CEOD_URL =
-    'https://computeengineondemand.appspot.com/turn?username=1234&key=5678';
-Call.fetchCEODTurnConfig_ = function(onSuccess, onError) {
-  var xhr = new XMLHttpRequest();
-  function onResult() {
-    if (xhr.readyState !== 4) {
-      return;
-    }
-
-    if (xhr.status !== 200) {
-      onError('TURN request failed');
-      return;
-    }
-
-    var response = JSON.parse(xhr.responseText);
-    onSuccess(response);
-  }
-
-  xhr.onreadystatechange = onResult;
-  xhr.open('GET', Call.CEOD_URL, true);
-  xhr.send();
 };
