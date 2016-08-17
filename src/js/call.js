@@ -164,7 +164,7 @@ Call.asyncCreateTurnConfig = function(onSuccess) {
   } else {
     iceServer = {
       'credential': 'siicckk',
-      'urls': ['turn:collabra@turn.collabramusic.com']
+      'urls': ['turn:collabra@turn1.collabramusic.com']
     };
     config = {'iceServers': [iceServer]};
     report.traceEventInstant('turn-config', config);
@@ -186,7 +186,7 @@ Call.asyncCreateStunConfig = function(onSuccess) {
     setTimeout(onSuccess.bind(null, config), 0);
   } else {
     iceServer = {
-      'urls': ['stun:turn.collabramusic.com']
+      'urls': ['stun:stun.collabramusic.com']
     };
     config = {'iceServers': [iceServer]};
     report.traceEventInstant('stun-config', config);
